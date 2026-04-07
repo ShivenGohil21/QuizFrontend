@@ -41,7 +41,10 @@ const ResetPassword = () => {
     }
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+      const apiUrl = import.meta.env.VITE_API_URL;
+      if (!apiUrl) {
+        throw new Error("Backend API URL not configured.");
+      }
       const response = await fetch(`${apiUrl}/forgot-password/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -57,7 +60,8 @@ const ResetPassword = () => {
         setError(result.error || "Failed to update password.");
       }
     } catch (err) {
-      setError("An unexpected error occurred connecting to the server.");
+      console.error("Reset password error:", err);
+      setError(err.message || "An unexpected error occurred connecting to the server.");
     } finally {
       setLoading(false);
     }

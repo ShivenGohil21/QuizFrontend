@@ -12,7 +12,7 @@ import Terms from './components/Terms';
 import QuizPage from "./components/QuizPage";
 import QuizResultPage from './components/QuizResultPage';
 import { supabase } from './supabaseClient';
-import "./../node_modules/bootstrap/dist/css/bootstrap.min.css"
+import "bootstrap/dist/css/bootstrap.min.css"
 
 function App() {
   const [session, setSession] = useState(null);
@@ -25,33 +25,6 @@ function App() {
     }
   }, []);
 
-  useEffect(() => {
-    // Keep old connection tests for now
-    const testConnections = async () => {
-      // Test Supabase connection
-      try {
-        const { data, error } = await supabase.from('quizzes').select('count');
-        if (error) {
-          console.error("Supabase connection failed:", error);
-        } else {
-          console.log("✓ Supabase connected successfully");
-        }
-      } catch (err) {
-        console.error("Supabase error:", err);
-      }
-
-      // Test Django connection
-      try {
-        const response = await fetch("http://localhost:8000/api/");
-        const data = await response.json();
-        console.log("✓ Django connected:", data);
-      } catch (err) {
-        console.error("Django connection failed:", err);
-      }
-    };
-
-    testConnections();
-}, []);
   return (
     <Router>
       <Routes>

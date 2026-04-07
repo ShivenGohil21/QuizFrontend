@@ -17,20 +17,7 @@ const VerifyOtp = () => {
     if (!type) {
       navigate("/");
     }
-    
-    // If it's MFA but we don't have a challenge ID, create one
-    if (type === 'mfa' && factorId && !challengeId) {
-      const createChallenge = async () => {
-        const { data, error } = await supabase.auth.mfa.challenge({ factorId });
-        if (error) {
-          setError(error.message);
-        } else {
-          setChallengeId(data.id);
-        }
-      };
-      createChallenge();
-    }
-  }, [type, factorId, challengeId, navigate]);
+  }, [type, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,7 +31,10 @@ const VerifyOtp = () => {
     }
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+      const apiUrl = import.meta.env.VITE_API_URL;
+      if (!apiUrl) {
+        throw new Error("Backend API URL not configured.");
+      }
       const response = await fetch(`${apiUrl}/auth/verify-otp/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -67,7 +57,8 @@ const VerifyOtp = () => {
         setError(result.error || "Invalid verification code.");
       }
     } catch (err) {
-      setError("An unexpected error occurred connecting to the server.");
+      console.error("Verification error:", err);
+      setError(err.message || "An unexpected error occurred connecting to the server.");
     } finally {
       setLoading(false);
     }
@@ -78,11 +69,9 @@ const VerifyOtp = () => {
       <div className="login-page-wrapper" style={{ maxWidth: '500px', minHeight: 'auto' }}>
         <div className="login-right-section" style={{ flex: 1, padding: '48px' }}>
           <div className="login-form-container">
-            <h2>{type === 'mfa' ? 'App Authentication' : 'Verify Recovery'}</h2>
+            <h2>{type === 'recovery' ? 'Verify Recovery' : 'Verify Email'}</h2>
             <p className="login-subtitle">
-              {type === 'mfa' 
-                ? 'Enter the 6-digit code from your Google Authenticator app'
-                : `Enter the 6-digit recovery code sent to your email`}
+              {`Enter the 6-digit verification code sent to ${email || 'your email'}`}
             </p>
 
             {error && <div className="error-card" style={{ marginBottom: '20px' }}>{error}</div>}

@@ -33,7 +33,11 @@ const Signup = () => {
     }
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+      const apiUrl = import.meta.env.VITE_API_URL;
+      if (!apiUrl) {
+        throw new Error("Backend API URL is not configured. Please add VITE_API_URL to your environment variables.");
+      }
+
       const response = await fetch(`${apiUrl}/auth/send-otp/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -49,7 +53,8 @@ const Signup = () => {
         setError(result.error || "Failed to send verification code.");
       }
     } catch (err) {
-      setError("Failed to connect to the server.");
+      console.error("Signup OTP error:", err);
+      setError(err.message || "Failed to connect to the server.");
     } finally {
       setLoading(false);
     }
@@ -79,7 +84,11 @@ const Signup = () => {
     }
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+      const apiUrl = import.meta.env.VITE_API_URL;
+      if (!apiUrl) {
+        throw new Error("Backend API URL is not configured.");
+      }
+
       const response = await fetch(`${apiUrl}/auth/register/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -106,7 +115,8 @@ const Signup = () => {
         setError(errorMsg);
       }
     } catch (err) {
-      setError("Failed to connect to the server.");
+      console.error("Signup register error:", err);
+      setError(err.message || "Failed to connect to the server.");
     } finally {
       setLoading(false);
     }

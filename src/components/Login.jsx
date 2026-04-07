@@ -26,7 +26,11 @@ const Login = () => {
     }
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+      const apiUrl = import.meta.env.VITE_API_URL;
+      if (!apiUrl) {
+        throw new Error("API URL not configured. Please check your environment variables.");
+      }
+
       const response = await fetch(`${apiUrl}/auth/send-otp/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -42,7 +46,8 @@ const Login = () => {
         setError(result.error || "Failed to send verification code.");
       }
     } catch (err) {
-      setError("An unexpected error occurred connecting to the server.");
+      console.error("Login error:", err);
+      setError(err.message || "An unexpected error occurred connecting to the server.");
     } finally {
       setLoading(false);
     }

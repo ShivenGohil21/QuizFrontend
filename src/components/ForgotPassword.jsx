@@ -23,7 +23,10 @@ const ForgotPassword = () => {
     }
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+      const apiUrl = import.meta.env.VITE_API_URL;
+      if (!apiUrl) {
+        throw new Error("Backend API URL not configured.");
+      }
       const response = await fetch(`${apiUrl}/auth/send-otp/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -42,7 +45,8 @@ const ForgotPassword = () => {
         setError(result.error || "Failed to send recovery code.");
       }
     } catch (err) {
-      setError("An unexpected error occurred connecting to the server.");
+      console.error("Forgot password error:", err);
+      setError(err.message || "An unexpected error occurred connecting to the server.");
     } finally {
       setLoading(false);
     }
