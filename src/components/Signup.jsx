@@ -35,14 +35,28 @@ const Signup = () => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL;
       if (!apiUrl) {
-        throw new Error("Backend API URL is not configured. Please add VITE_API_URL to your environment variables.");
+        throw new Error("Backend API URL not configured. Please add VITE_API_URL to your Vercel Environment Variables.");
       }
 
-      const response = await fetch(`${apiUrl}/auth/send-otp/`, {
+      const requestUrl = `${apiUrl}/auth/send-otp/`;
+      const response = await fetch(requestUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: formData.email }),
       });
+
+      // Check if the response is actually JSON
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await response.text();
+        console.error("Non-JSON response received:", {
+          url: requestUrl,
+          status: response.status,
+          contentType,
+          bodySample: text.substring(0, 200)
+        });
+        throw new Error(`Server returned non-JSON response (${response.status}). This usually means the API URL is incorrect.`);
+      }
 
       const result = await response.json();
 
@@ -53,7 +67,10 @@ const Signup = () => {
         setError(result.error || "Failed to send verification code.");
       }
     } catch (err) {
-      console.error("Signup OTP error:", err);
+      console.error("Signup OTP context:", {
+        apiUrl: import.meta.env.VITE_API_URL,
+        error: err
+      });
       setError(err.message || "Failed to connect to the server.");
     } finally {
       setLoading(false);
@@ -89,7 +106,8 @@ const Signup = () => {
         throw new Error("Backend API URL is not configured.");
       }
 
-      const response = await fetch(`${apiUrl}/auth/register/`, {
+      const requestUrl = `${apiUrl}/auth/register/`;
+      const response = await fetch(requestUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -99,6 +117,19 @@ const Signup = () => {
           otp: formData.otp,
         }),
       });
+
+      // Check if the response is actually JSON
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await response.text();
+        console.error("Non-JSON response received:", {
+          url: requestUrl,
+          status: response.status,
+          contentType,
+          bodySample: text.substring(0, 200)
+        });
+        throw new Error(`Server returned non-JSON response (${response.status}). This usually means the API URL is incorrect.`);
+      }
 
       const result = await response.json();
 
@@ -115,7 +146,10 @@ const Signup = () => {
         setError(errorMsg);
       }
     } catch (err) {
-      console.error("Signup register error:", err);
+      console.error("Signup register context:", {
+        apiUrl: import.meta.env.VITE_API_URL,
+        error: err
+      });
       setError(err.message || "Failed to connect to the server.");
     } finally {
       setLoading(false);

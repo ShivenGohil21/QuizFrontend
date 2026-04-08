@@ -43,13 +43,28 @@ const ResetPassword = () => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL;
       if (!apiUrl) {
-        throw new Error("Backend API URL not configured.");
+        throw new Error("Backend API URL not configured. Please add VITE_API_URL to your Vercel Environment Variables.");
       }
-      const response = await fetch(`${apiUrl}/forgot-password/`, {
+      
+      const requestUrl = `${apiUrl}/forgot-password/`;
+      const response = await fetch(requestUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, new_password: password }),
       });
+
+      // Check if the response is actually JSON
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await response.text();
+        console.error("Non-JSON response received:", {
+          url: requestUrl,
+          status: response.status,
+          contentType,
+          bodySample: text.substring(0, 200)
+        });
+        throw new Error(`Server returned non-JSON response (${response.status}). This usually means the API URL is incorrect.`);
+      }
 
       const result = await response.json();
 
@@ -60,7 +75,10 @@ const ResetPassword = () => {
         setError(result.error || "Failed to update password.");
       }
     } catch (err) {
-      console.error("Reset password error:", err);
+      console.error("Reset password context:", {
+        apiUrl: import.meta.env.VITE_API_URL,
+        error: err
+      });
       setError(err.message || "An unexpected error occurred connecting to the server.");
     } finally {
       setLoading(false);
