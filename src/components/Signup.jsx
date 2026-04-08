@@ -41,7 +41,10 @@ const Signup = () => {
       const requestUrl = `${apiUrl}/auth/send-otp/`;
       const response = await fetch(requestUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
         body: JSON.stringify({ email: formData.email }),
       });
 
@@ -109,7 +112,10 @@ const Signup = () => {
       const requestUrl = `${apiUrl}/auth/register/`;
       const response = await fetch(requestUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
         body: JSON.stringify({
           username: formData.name,
           email: formData.email,

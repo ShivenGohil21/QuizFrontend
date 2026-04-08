@@ -49,7 +49,10 @@ const ResetPassword = () => {
       const requestUrl = `${apiUrl}/forgot-password/`;
       const response = await fetch(requestUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
         body: JSON.stringify({ email, new_password: password }),
       });
 

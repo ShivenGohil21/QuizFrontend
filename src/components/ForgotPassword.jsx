@@ -31,7 +31,10 @@ const ForgotPassword = () => {
       const requestUrl = `${apiUrl}/auth/send-otp/`;
       const response = await fetch(requestUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
         body: JSON.stringify({ email }),
       });
 
